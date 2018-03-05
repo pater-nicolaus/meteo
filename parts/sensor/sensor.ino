@@ -28,7 +28,7 @@ void loop(void) {
    float temp(NAN), hum(NAN), pres(NAN);
    char pressstr[100];
    char humiditystr[100];
-   char tempstr[100];
+   char temperature[100];
    
 
   while(!bme.begin())
@@ -54,6 +54,7 @@ void loop(void) {
    bme.read( pres, temp, hum, tempUnit, presUnit);
    sprintf(pressstr, "pressure %f", pressure);
    sprintf(humiditystr, "humidity %f", humidity);
+   sprintf(temperature, "temp %d", (int)temp);
    
    // picture loop  
    u8g.firstPage();  
@@ -61,8 +62,14 @@ void loop(void) {
        u8g_prepare();
        u8g.drawStr( 0, 0, pressstr);
        u8g.drawStr( 0, 16, humiditystr);
-       
+       u8g.drawStr( 0, 32,temperature); 
+
+       u8g.drawTriangle(110,0, 64,63, 110,63);
+  
+       u8g.drawFrame(5,10+30,20,10);
+
    } while( u8g.nextPage() );
   
    delay(1000);
-}
+} 
+
