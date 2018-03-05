@@ -27,7 +27,7 @@ void setup(void) {
 void loop(void) {
    float temp(NAN), hum(NAN), pres(NAN);
    char pressstr[100];
-
+   char temperature[100];
   while(!bme.begin())
   {
     delay(1000);
@@ -40,13 +40,24 @@ void loop(void) {
 
    bme.read(pres, temp, hum, tempUnit, presUnit);
    sprintf(pressstr, "pressure %f", (double)pres);
-  
+   sprintf(temperature, "temp %d", (int)temp);
+   
    // picture loop  
    u8g.firstPage();  
    do {
        u8g_prepare();
        u8g.drawStr( 0, 0, pressstr); 
-   } while( u8g.nextPage() );
+       u8g.drawStr( 0, 32,temperature); 
+
+  u8g.drawTriangle(110,0, 64,63, 110,63);
+  
+  u8g.drawFrame(5,10+30,20,10);
+
+
+  } while( u8g.nextPage() );
+  Serial.print(pressstr);
+
   
    delay(1000);
-}
+} 
+
