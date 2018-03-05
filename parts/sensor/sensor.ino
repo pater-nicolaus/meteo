@@ -27,6 +27,9 @@ void setup(void) {
 void loop(void) {
    float temp(NAN), hum(NAN), pres(NAN);
    char pressstr[100];
+   char humiditystr[100];
+   char tempstr[100];
+   
 
   while(!bme.begin())
   {
@@ -38,14 +41,27 @@ void loop(void) {
    BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
    BME280::PresUnit presUnit(BME280::PresUnit_inHg);
 
-   bme.read(pres, temp, hum, tempUnit, presUnit);
-   sprintf(pressstr, "pressure %f", (double)pres);
-  
+   int humidity;
+
+   humidity = hum *10;
+   humidity /= 10;
+   
+   int pressure;
+
+   pressure = pres * 10;
+   pressure /= 10;
+   
+   bme.read( pres, temp, hum, tempUnit, presUnit);
+   sprintf(pressstr, "pressure %f", pressure);
+   sprintf(humiditystr, "humidity %f", humidity);
+   
    // picture loop  
    u8g.firstPage();  
    do {
        u8g_prepare();
-       u8g.drawStr( 0, 0, pressstr); 
+       u8g.drawStr( 0, 0, pressstr);
+       u8g.drawStr( 0, 16, humiditystr);
+       
    } while( u8g.nextPage() );
   
    delay(1000);
