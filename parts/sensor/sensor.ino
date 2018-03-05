@@ -41,19 +41,11 @@ void loop(void) {
    BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
    BME280::PresUnit presUnit(BME280::PresUnit_inHg);
 
-   int humidity;
-
-   humidity = hum *10;
-   humidity /= 10;
-   
-   int pressure;
-
-   pressure = pres * 10;
-   pressure /= 10;
-   
    bme.read( pres, temp, hum, tempUnit, presUnit);
-   sprintf(pressstr, "pressure %f", pressure);
-   sprintf(humiditystr, "humidity %f", humidity);
+  pres *= 25,4;
+
+   sprintf(pressstr, "pressure %d", (int)pres);
+   sprintf(humiditystr, "humidity %d", (int)hum);
    sprintf(temperature, "temp %d", (int)temp);
    
    // picture loop  
