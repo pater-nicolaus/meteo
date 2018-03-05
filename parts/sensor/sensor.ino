@@ -9,6 +9,13 @@ U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_DEV_0|U8G_I2C_OPT_FAST);	// Dev 0, Fast I2C
 BME280I2C bme;    // Default : forced mode, standby time = 1000 ms
                   // Oversampling = pressure x1, temperature x1, humidity x1, filter off,
 
+void u8g_prepare(void) {
+  u8g.setFont(u8g_font_6x10);
+  u8g.setFontRefHeightExtendedText();
+  u8g.setDefaultForegroundColor();
+  u8g.setFontPosTop();
+}
+
 void setup(void) {
   Serial.begin(SERIAL_BAUD);  
 #if defined(ARDUINO)
@@ -21,12 +28,25 @@ void loop(void) {
    float temp(NAN), hum(NAN), pres(NAN);
    char pressstr[100];
 
+  while(!bme.begin())
+  {
+    delay(1000);
+  }
+  bme.chipModel();
+
+
    BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
    BME280::PresUnit presUnit(BME280::PresUnit_inHg);
 
    bme.read(pres, temp, hum, tempUnit, presUnit);
-   sprintf(pressstr, "pressure %f", pres);
-   u8g.drawStr( 0, 0, pressstr); 
+   sprintf(pressstr, "pressure %f", (double)pres);
+  
+   // picture loop  
+   u8g.firstPage();  
+   do {
+       u8g_prepare();
+       u8g.drawStr( 0, 0, pressstr); 
+   } while( u8g.nextPage() );
   
    delay(1000);
 }
