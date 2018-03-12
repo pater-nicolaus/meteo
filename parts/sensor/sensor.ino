@@ -10,7 +10,7 @@ BME280I2C bme;    // Default : forced mode, standby time = 1000 ms
                   // Oversampling = pressure x1, temperature x1, humidity x1, filter off,
 
 void u8g_prepare() {
-  u8g.setFont(u8g_font_6x10);
+  u8g.setFont(u8g_font_9x18);
   u8g.setFontRefHeightExtendedText();
   u8g.setDefaultForegroundColor();
   u8g.setFontPosTop();
@@ -26,6 +26,8 @@ void setup() {
 
 void loop() {
   float temp, hum, pres;
+
+  // Variable Declaration
   char pressstr[100];
   char humiditystr[100];
   char temperature[100];
@@ -37,19 +39,22 @@ void loop() {
   }
   bme.chipModel();
 
-
+  // Value type declaration
   BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
   BME280::PresUnit presUnit(BME280::PresUnit_inHg);
 
+  // Read from microcontroller
   bme.read( pres, temp, hum, tempUnit, presUnit);
+
+  // Pressure Conversion
   pres *= 25,4;
 
-  //Value Prepaire
-  sprintf(pressstr, "Pressure: %d", (int)pres);
-  sprintf(humiditystr, "Humidity: %d", (int)hum);
-  sprintf(temperature, "Temp:     %d", (int)temp);
+  // Value Prepairation
+  sprintf(pressstr,    "Press:   %d ", (int)pres);
+  sprintf(humiditystr, "Humid:   %d %%", (int)hum);
+  sprintf(temperature, "Temp:    %d C", (int)temp);
    
-  // picture loop  
+  // Picture loop  
   u8g.firstPage();  
   do {
       u8g_prepare();
@@ -57,8 +62,6 @@ void loop() {
       u8g.drawStr( 0, 16, humiditystr);
       u8g.drawStr( 0, 32,temperature); 
 
-      //u8g.drawTriangle(110,0, 64,63, 110,63);
-  
       //u8g.drawFrame(5,10+30,20,10);
 
    } while( u8g.nextPage() );
