@@ -9,14 +9,14 @@ U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_DEV_0|U8G_I2C_OPT_FAST);	// Dev 0, Fast I2C
 BME280I2C bme;    // Default : forced mode, standby time = 1000 ms
                   // Oversampling = pressure x1, temperature x1, humidity x1, filter off,
 
-void u8g_prepare(void) {
+void u8g_prepare() {
   u8g.setFont(u8g_font_6x10);
   u8g.setFontRefHeightExtendedText();
   u8g.setDefaultForegroundColor();
   u8g.setFontPosTop();
 }
 
-void setup(void) {
+void setup() {
   Serial.begin(SERIAL_BAUD);  
 #if defined(ARDUINO)
   pinMode(13, OUTPUT);           
@@ -24,11 +24,11 @@ void setup(void) {
 #endif
 }
 
-void loop(void) {
-   float temp(NAN), hum(NAN), pres(NAN);
-   char pressstr[100];
-   char humiditystr[100];
-   char temperature[100];
+void loop() {
+  float temp, hum, pres;
+  char pressstr[100];
+  char humiditystr[100];
+  char temperature[100];
    
 
   while(!bme.begin())
@@ -38,30 +38,31 @@ void loop(void) {
   bme.chipModel();
 
 
-   BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
-   BME280::PresUnit presUnit(BME280::PresUnit_inHg);
+  BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
+  BME280::PresUnit presUnit(BME280::PresUnit_inHg);
 
-   bme.read( pres, temp, hum, tempUnit, presUnit);
+  bme.read( pres, temp, hum, tempUnit, presUnit);
   pres *= 25,4;
 
-   sprintf(pressstr, "pressure %d", (int)pres);
-   sprintf(humiditystr, "humidity %d", (int)hum);
-   sprintf(temperature, "temp %d", (int)temp);
+  //Value Prepaire
+  sprintf(pressstr, "Pressure: %d", (int)pres);
+  sprintf(humiditystr, "Humidity: %d", (int)hum);
+  sprintf(temperature, "Temp:     %d", (int)temp);
    
-   // picture loop  
-   u8g.firstPage();  
-   do {
-       u8g_prepare();
-       u8g.drawStr( 0, 0, pressstr);
-       u8g.drawStr( 0, 16, humiditystr);
-       u8g.drawStr( 0, 32,temperature); 
+  // picture loop  
+  u8g.firstPage();  
+  do {
+      u8g_prepare();
+      u8g.drawStr( 0, 0, pressstr);
+      u8g.drawStr( 0, 16, humiditystr);
+      u8g.drawStr( 0, 32,temperature); 
 
-       u8g.drawTriangle(110,0, 64,63, 110,63);
+      //u8g.drawTriangle(110,0, 64,63, 110,63);
   
-       u8g.drawFrame(5,10+30,20,10);
+      //u8g.drawFrame(5,10+30,20,10);
 
    } while( u8g.nextPage() );
   
-   delay(1000);
+  delay(1000);
 } 
 
