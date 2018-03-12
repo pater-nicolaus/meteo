@@ -2,6 +2,10 @@
 #include <BME280I2C.h>
 #include <Wire.h>
 
+// TODO
+// 1. Remainder displays incorectly
+
+
 U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_DEV_0|U8G_I2C_OPT_FAST);	// Dev 0, Fast I2C / TWI
 
 #define SERIAL_BAUD 115200
@@ -31,7 +35,13 @@ void loop() {
   char pressstr[100];
   char humiditystr[100];
   char temperature[100];
-   
+  int press_int;
+  int press_remainder;
+  int temp_int;
+  int temp_remainder;
+  int accuracy;
+
+  accuracy = 100;
 
   while(!bme.begin())
   {
@@ -48,11 +58,19 @@ void loop() {
 
   // Pressure Conversion
   pres *= 25,4;
+  pres *= accuracy;
+  press_int = (long)pres/accuracy;
+  press_remainder = (long)pres % accuracy;
+
+  // Temp Conversion
+  temp *= accuracy;
+  temp_int = (long)temp/accuracy;
+  temp_remainder = (long)temp % accuracy;
 
   // Value Prepairation
-  sprintf(pressstr,    "Press:   %d ", (int)pres);
-  sprintf(humiditystr, "Humid:   %d %%", (int)hum);
-  sprintf(temperature, "Temp:    %d C", (int)temp);
+  sprintf(pressstr,    "Press: %d,%d ", (int)press_int, (int)press_remainder);
+  sprintf(humiditystr, "Humid: %d %%", (int)hum);
+  sprintf(temperature, "Temp:  %d,%d C", (int)temp_int,(int)temp_remainder);
    
   // Picture loop  
   u8g.firstPage();  
