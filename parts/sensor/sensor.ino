@@ -1,9 +1,9 @@
 #include <U8glib.h>
 #include <BME280I2C.h>
 #include <Wire.h>
-
-// TODO
-// 1. Remainder displays incorectly
+#include <math.h>
+#include <stdio.h>
+#include <string.h> 
 
 
 U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_DEV_0|U8G_I2C_OPT_FAST);	// Dev 0, Fast I2C / TWI
@@ -35,13 +35,14 @@ void loop() {
   char pressstr[100];
   char humiditystr[100];
   char temperature[100];
+
+  // Decimal
   int press_int;
   int press_remainder;
   int temp_int;
   int temp_remainder;
-  int accuracy;
-
-  accuracy = 100;
+  int accuracy = 2; // Must be => 1
+  int multiplier = pow(10, accuracy);
 
   while(!bme.begin())
   {
@@ -49,41 +50,48 @@ void loop() {
   }
   bme.chipModel();
 
-  // Value type declaration
+  // Unit type declaration
   BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
   BME280::PresUnit presUnit(BME280::PresUnit_inHg);
 
-  // Read from microcontroller
+  // Read data from BME280
   bme.read( pres, temp, hum, tempUnit, presUnit);
 
   // Pressure Conversion
   pres *= 25,4;
-  pres *= accuracy;
-  press_int = (long)pres/accuracy;
-  press_remainder = (long)pres % accuracy;
+  pres *= multiplier;
+  press_int = (long)pres/multiplier;
+  press_remainder = (long)pres % multiplier;
 
   // Temp Conversion
-  temp *= accuracy;
-  temp_int = (long)temp/accuracy;
-  temp_remainder = (long)temp % accuracy;
+  if(temp != 0){
+      temp *= multiplier;
+      temp_int = (long)temp/multiplier;
+      temp_remainder = (long)temp % multiplier;       
+    } else {
+      temp_int = 0;
+      temp_remainder = 0;
+  }
 
   // Value Prepairation
-  sprintf(pressstr,    "Press: %d,%d ", (int)press_int, (int)press_remainder);
-  sprintf(humiditystr, "Humid: %d %%", (int)hum);
+  String pressureST = "Press: " + String(press_int, DEC) + '.' + String(press_remainder, DEC);
+  String tempST = "Temp: " + String(temp_int, DEC) + "." + String(temp_remainder, DEC);
+  pressureST.toCharArray(pressstr, sizeof(pressstr));
+  tempST.toCharArray(temperature, sizeof(temperature));
   sprintf(temperature, "Temp:  %d,%d C", (int)temp_int,(int)temp_remainder);
-   
-  // Picture loop  
+
+  //sprintf(pressstr,    "Press: %d,%d ", (int)press_int, (int)press_remainder);
+  //sprintf(humiditystr, "Humid: %d %%", (int)hum);
+
+  // Display output
   u8g.firstPage();  
   do {
       u8g_prepare();
       u8g.drawStr( 0, 0, pressstr);
       u8g.drawStr( 0, 16, humiditystr);
       u8g.drawStr( 0, 32,temperature); 
-
-      //u8g.drawFrame(5,10+30,20,10);
-
-   } while( u8g.nextPage() );
-  
+    
+    } while( u8g.nextPage() );
+   
   delay(1000);
 } 
-
