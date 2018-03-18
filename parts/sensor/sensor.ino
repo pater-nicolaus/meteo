@@ -20,6 +20,22 @@ void u8g_prepare() {
   u8g.setFontPosTop();
 }
 
+// Counts the amount of needed zeros
+String zero_adder(int source, int accuracy_var){
+  String zeros_var = "";
+  int digits = 0;
+  while (source >= 10){
+    source /= 10;
+    digits++;
+  }
+
+  if(digits < accuracy_var){
+    for(int i = 1; i<(accuracy_var - digits); i++){ zeros_var = zeros_var + "0"; }
+  }
+
+  return zeros_var;
+  }
+
 void setup() {
   Serial.begin(SERIAL_BAUD);  
 #if defined(ARDUINO)
@@ -43,6 +59,7 @@ void loop() {
   int temp_remainder;
   int accuracy = 2; // Must be => 1
   int multiplier = pow(10, accuracy);
+  String zeros = ""; // Zeros is decimal output
 
   while(!bme.begin())
   {
@@ -73,9 +90,12 @@ void loop() {
       temp_remainder = 0;
   }
 
+  
   // Value Prepairation
-  String pressureST = "Press: " + String(press_int, DEC) + '.' + String(press_remainder, DEC);
-  String tempST = "Temp: " + String(temp_int, DEC) + "." + String(temp_remainder, DEC);
+  zeros = zero_adder(press_remainder, accuracy);
+  String pressureST = "Press: " + String(press_int, DEC) + '.' + zeros + String(press_remainder, DEC);
+  zeros = zero_adder(temp_remainder, accuracy);
+  String tempST = "Temp: " + String(temp_int, DEC) + "." + zeros + String(temp_remainder, DEC);
   pressureST.toCharArray(pressstr, sizeof(pressstr));
   tempST.toCharArray(temperature, sizeof(temperature));
   sprintf(temperature, "Temp:  %d,%d C", (int)temp_int,(int)temp_remainder);
