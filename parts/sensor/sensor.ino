@@ -57,7 +57,7 @@ void loop() {
   int press_remainder;
   int temp_int;
   int temp_remainder;
-  int accuracy = 2; // Must be => 1
+  int accuracy = 1; // Must be => 1
   int multiplier = pow(10, accuracy);
   String zeros = ""; // Zeros is decimal output
 
@@ -95,10 +95,10 @@ void loop() {
   zeros = zero_adder(press_remainder, accuracy);
   String pressureST = "Press: " + String(press_int, DEC) + '.' + zeros + String(press_remainder, DEC);
   zeros = zero_adder(temp_remainder, accuracy);
-  String tempST = "Temp: " + String(temp_int, DEC) + "." + zeros + String(temp_remainder, DEC);
+  String tempST = "Temp: " + String(temp_int, DEC) + "." + zeros + String(temp_remainder, DEC) + " C";
   pressureST.toCharArray(pressstr, sizeof(pressstr));
   tempST.toCharArray(temperature, sizeof(temperature));
-  sprintf(temperature, "Temp:  %d,%d C", (int)temp_int,(int)temp_remainder);
+  sprintf(humiditystr, "Hum:  %d %%", (int)hum);
 
   //sprintf(pressstr,    "Press: %d,%d ", (int)press_int, (int)press_remainder);
   //sprintf(humiditystr, "Humid: %d %%", (int)hum);
