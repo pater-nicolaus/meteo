@@ -59,12 +59,24 @@ void loop() {
   int temp_remainder;
   int accuracy = 1; // Must be => 1
   int multiplier = pow(10, accuracy);
+  int fail = 0;
   String zeros = ""; // Zeros is decimal output
 
   while(!bme.begin())
   {
+    fail++;
+    if(fail >= 3){
+      fail = 0;
+      u8g.firstPage();
+      do {
+        u8g_prepare();
+        u8g.drawStr( 0, 0, "BME Failure"); 
+        u8g.drawStr( 0, 16, "Retrying..."); 
+      } while( u8g.nextPage() );
+    }
     delay(1000);
   }
+  fail = 0;
   bme.chipModel();
 
   // Unit type declaration
