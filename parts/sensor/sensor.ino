@@ -127,3 +127,26 @@ void loop() {
    
   delay(1000);
 } 
+
+uint8_t received_data[];
+bool recieve_ctrl = 0;
+
+uint8_t recieve_bt_data(){
+  /***
+  //PLACEHOLDER = RECIEVED DATA FROM BT CONTROLLER
+  ***/
+  return //PLACEHOLDER
+}
+
+void package_reciever(){
+  uint8_t blue_pkg = recieve_bt_data();
+  if ( (blue_pkg = 0xa0) or (blue_pkg = 0x20)){
+    recieve_ctrl = 1;
+    recieved_data[0] = blue_pkg;
+    recieved_data[1] = recieve_bt_data();
+    recieved_data[2] = recieve_bt_data();
+    for(i = 3; i < int( received_data[1] ); i++){
+      received_data[i] = recieve_bt_data();
+    }
+  }
+}
