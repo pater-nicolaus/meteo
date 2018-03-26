@@ -1,4 +1,4 @@
-#include <U8glib.h>
+#include <U8glib.h>.....
 #include <BME280I2C.h>
 #include <Wire.h>
 #include <math.h>
@@ -63,6 +63,7 @@ void loop() {
 
   while(!bme.begin())
   {
+    
     delay(1000);
   }
   bme.chipModel();
@@ -95,7 +96,7 @@ void loop() {
   zeros = zero_adder(press_remainder, accuracy);
   String pressureST = "Press: " + String(press_int, DEC) + '.' + zeros + String(press_remainder, DEC);
   zeros = zero_adder(temp_remainder, accuracy);
-  String tempST = "Temp: " + String(temp_int, DEC) + "." + zeros + String(temp_remainder, DEC) + " C";
+  String tempST = "Temp: " + String(temp_int, DEC) + "." + zeros + String(temp_remainder, DEC) + " Cа";
   pressureST.toCharArray(pressstr, sizeof(pressstr));
   tempST.toCharArray(temperature, sizeof(temperature));
   sprintf(humiditystr, "Hum:  %d %%", (int)hum);
@@ -110,6 +111,7 @@ void loop() {
       u8g.drawStr( 0, 0, pressstr);
       u8g.drawStr( 0, 16, humiditystr);
       u8g.drawStr( 0, 32,temperature); 
+      
     
     } while( u8g.nextPage() );
    
