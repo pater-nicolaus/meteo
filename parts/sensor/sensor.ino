@@ -57,11 +57,13 @@ void loop() {
   int press_remainder;
   int temp_int;
   int temp_remainder;
+  // SETUP
   int accuracy = 1; // Must be => 1
   int multiplier = pow(10, accuracy);
-  int fail = 0;
   String zeros = ""; // Zeros is decimal output
 
+  // BME Failcheck
+  int fail = 0;
   while(!bme.begin())
   {
     fail++;
@@ -77,6 +79,7 @@ void loop() {
     delay(1000);
   }
   fail = 0;
+  // BME Setup
   bme.chipModel();
 
   // Unit type declaration
@@ -128,6 +131,7 @@ void loop() {
   delay(1000);
 } 
 
+// Reciever version 1 ___________________________________________________________
 uint8_t received_data[];
 bool recieve_ctrl = 0;
 
@@ -150,3 +154,28 @@ void package_reciever(){
     }
   }
 }
+// END OF Reciever version 1 ____________________________________________________
+
+
+// Reciever version 2 ___________________________________________________________
+int reciever_counter = 0;
+void bt_pkg_reciever(bt_pkg){
+  if(reciever_counter < 2){
+    recieved_data[reciever_counter] = bt_pkg;
+    reciever_counter++;
+  }  
+  elif(2 < reciever_counter < int( received_data[1] )){
+    recieved_data[reciever_counter] = bt_pkg;
+    reciever_counter++;
+  }
+  else{
+    decoder(received_data)
+    reciever_counter = 0;
+  }
+}
+
+void decoder(bt_data){
+//EMPTY
+}
+
+// END OF Reciever version 2 ____________________________________________________
