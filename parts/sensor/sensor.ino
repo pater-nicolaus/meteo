@@ -57,15 +57,29 @@ void loop() {
   int press_remainder;
   int temp_int;
   int temp_remainder;
+  // SETUP
   int accuracy = 1; // Must be => 1
   int multiplier = pow(10, accuracy);
   String zeros = ""; // Zeros is decimal output
 
+  // BME Failcheck
+  int fail = 0;
   while(!bme.begin())
   {
-    
+    fail++;
+    if(fail >= 3){
+      fail = 0;
+      u8g.firstPage();
+      do {
+        u8g_prepare();
+        u8g.drawStr( 0, 0, "BME Failure"); 
+        u8g.drawStr( 0, 16, "Retrying..."); 
+      } while( u8g.nextPage() );
+    }
     delay(1000);
   }
+  fail = 0;
+  // BME Setup
   bme.chipModel();
 
   // Unit type declaration
@@ -96,7 +110,7 @@ void loop() {
   zeros = zero_adder(press_remainder, accuracy);
   String pressureST = "Press: " + String(press_int, DEC) + '.' + zeros + String(press_remainder, DEC);
   zeros = zero_adder(temp_remainder, accuracy);
-  String tempST = "Temp: " + String(temp_int, DEC) + "." + zeros + String(temp_remainder, DEC) + " CÐ°";
+  String tempST = "Temp: " + String(temp_int, DEC) + "." + zeros + String(temp_remainder, DEC) + " Cà";
   pressureST.toCharArray(pressstr, sizeof(pressstr));
   tempST.toCharArray(temperature, sizeof(temperature));
   sprintf(humiditystr, "Hum:  %d %%", (int)hum);
@@ -117,3 +131,52 @@ void loop() {
    
   delay(1000);
 } 
+
+// Reciever version 1 ___________________________________________________________
+uint8_t received_data[];
+bool recieve_ctrl = 0;
+
+uint8_t recieve_bt_data(){
+  /***
+  //PLACEHOLDER = RECIEVED DATA FROM BT CONTROLLER
+  ***/
+  return //PLACEHOLDER
+}
+
+void package_reciever(){
+  uint8_t blue_pkg = recieve_bt_data();
+  if ( (blue_pkg = 0xa0) or (blue_pkg = 0x20)){
+    recieve_ctrl = 1;
+    recieved_data[0] = blue_pkg;
+    recieved_data[1] = recieve_bt_data();
+    recieved_data[2] = recieve_bt_data();
+    for(i = 3; i < int( received_data[1] ); i++){
+      received_data[i] = recieve_bt_data();
+    }
+  }
+}
+// END OF Reciever version 1 ____________________________________________________
+
+
+// Reciever version 2 ___________________________________________________________
+int reciever_counter = 0;
+void bt_pkg_reciever(bt_pkg){
+  if(reciever_counter < 2){
+    recieved_data[reciever_counter] = bt_pkg;
+    reciever_counter++;
+  }  
+  elif(2 < reciever_counter < int( received_data[1] )){
+    recieved_data[reciever_counter] = bt_pkg;
+    reciever_counter++;
+  }
+  else{
+    decoder(received_data)
+    reciever_counter = 0;
+  }
+}
+
+void decoder(bt_data){
+//EMPTY
+}
+
+// END OF Reciever version 2 ____________________________________________________
