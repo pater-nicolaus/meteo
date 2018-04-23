@@ -133,44 +133,36 @@ void loop() {
 } 
 
 // Reciever version 2 ___________________________________________________________
-int reciever_counter = 0;
-int payload_length = 0;
+//int reciever_counter = 0;
+int payload_size = 0;
 int recieved_beggining = 0;
 int data_counter = 0;
 
 void bt_pkg_reciever(uint8_t* location, uint8_t size){
   uint8_t *p = location;
-  uint8_t recieved_data[];
-  for(i = 0, i< (int)size, i++){
-    if( ( p[i] == 0xa0) || (p[i] == 0x20) && (recieved_beggining = 0) ) {recieved_beggining = 1; }
-    if(recieved_beggining = 1){
+  uint8_t recieved_data[]; //FIXME size is undefined
+  for (i = 0, i< (int)size, i++){
+
+    if (( p[i] == 0xa0) || (p[i] == 0x20) && (recieved_beggining = 0)) {recieved_beggining = 1; } // Finds responce beggining
+
+    if (data_counter == 1) { payload_size = p[i]; } // Gets Payload size
+
+    // Writes recieved data to array
+    if(recieved_beggining = 1){ 
       recieved_data[data_counter] = p[i];
       data_counter++;
-    }
-    if(data_counter == 1) {
-      payload_length = p[i];
-    }
 
+    // Sends loaded responce to decoder
+    if ((data_counter >= payload_size) && (data_counter > 1)){
+      data_counter = 0;
+      payload_size = 0;
+      recieved_beggining = 0;
+      decoder(received_data);
+      }
+    }
   }
-  decoder(received_data);
-  /**
-  if(reciever_counter < 2){
-    recieved_data[reciever_counter] = bt_pkg;
-    reciever_counter++;
-  }  
-  elif(2 < reciever_counter < int( received_data[1] )){
-    recieved_data[reciever_counter] = bt_pkg;
-    reciever_counter++;
-  }
-  else{
-    decoder(received_data)
-    reciever_counter = 0;
-  }
-  **/
 }
 
 void decoder(bt_data){
-//EMPTY
+//EMPTY, for now......
 }
-
-// END OF Reciever version 2 ____________________________________________________
