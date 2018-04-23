@@ -110,7 +110,7 @@ void loop() {
   zeros = zero_adder(press_remainder, accuracy);
   String pressureST = "Press: " + String(press_int, DEC) + '.' + zeros + String(press_remainder, DEC);
   zeros = zero_adder(temp_remainder, accuracy);
-  String tempST = "Temp: " + String(temp_int, DEC) + "." + zeros + String(temp_remainder, DEC) + " Cà";
+  String tempST = "Temp: " + String(temp_int, DEC) + "." + zeros + String(temp_remainder, DEC) + " Cï¿½";
   pressureST.toCharArray(pressstr, sizeof(pressstr));
   tempST.toCharArray(temperature, sizeof(temperature));
   sprintf(humiditystr, "Hum:  %d %%", (int)hum);
@@ -132,35 +132,28 @@ void loop() {
   delay(1000);
 } 
 
-// Reciever version 1 ___________________________________________________________
-uint8_t received_data[];
-bool recieve_ctrl = 0;
-
-uint8_t recieve_bt_data(){
-  /***
-  //PLACEHOLDER = RECIEVED DATA FROM BT CONTROLLER
-  ***/
-  return //PLACEHOLDER
-}
-
-void package_reciever(){
-  uint8_t blue_pkg = recieve_bt_data();
-  if ( (blue_pkg = 0xa0) or (blue_pkg = 0x20)){
-    recieve_ctrl = 1;
-    recieved_data[0] = blue_pkg;
-    recieved_data[1] = recieve_bt_data();
-    recieved_data[2] = recieve_bt_data();
-    for(i = 3; i < int( received_data[1] ); i++){
-      received_data[i] = recieve_bt_data();
-    }
-  }
-}
-// END OF Reciever version 1 ____________________________________________________
-
-
 // Reciever version 2 ___________________________________________________________
 int reciever_counter = 0;
-void bt_pkg_reciever(bt_pkg){
+int payload_length = 0;
+int recieved_beggining = 0;
+int data_counter = 0;
+
+void bt_pkg_reciever(uint8_t* location, uint8_t size){
+  uint8_t *p = location;
+  uint8_t recieved_data[];
+  for(i = 0, i< (int)size, i++){
+    if( ( p[i] == 0xa0) || (p[i] == 0x20) && (recieved_beggining = 0) ) {recieved_beggining = 1; }
+    if(recieved_beggining = 1){
+      recieved_data[data_counter] = p[i];
+      data_counter++;
+    }
+    if(data_counter == 1) {
+      payload_length = p[i];
+    }
+
+  }
+  decoder(received_data);
+  /**
   if(reciever_counter < 2){
     recieved_data[reciever_counter] = bt_pkg;
     reciever_counter++;
@@ -173,6 +166,7 @@ void bt_pkg_reciever(bt_pkg){
     decoder(received_data)
     reciever_counter = 0;
   }
+  **/
 }
 
 void decoder(bt_data){
