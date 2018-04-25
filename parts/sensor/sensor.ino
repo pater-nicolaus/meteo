@@ -209,7 +209,7 @@ void cmd_gatt_discover_characteristics(uint8_t* buf,uint8_t connection,uint32_t 
 }
 
 
-void cmd_gatt_discover_characteristics_by_uuid(uint8_t* buf, uint8_t connection, uint32_t service, uint8_t uuid_len, const uint8 *uuid_data){
+void cmd_gatt_discover_characteristics_by_uuid(uint8_t* buf, uint8_t connection, uint32_t service, uint8_t uuid_len, const uint8_t *uuid_data){
 
 
    buf[0] = 0x20;
@@ -221,11 +221,42 @@ void cmd_gatt_discover_characteristics_by_uuid(uint8_t* buf, uint8_t connection,
    buf[6] = service>>8;
    buf[7] = service>>16;
    buf[8] = service>>24;
-   buf[9] = uuid;
+//   buf[9] = uuid; TODO: IMPLEMENT
 }
 
 
+// Reciever version 2 ___________________________________________________________
+//int reciever_counter = 0;
+int payload_size = 0;
+int recieved_beggining = 0;
+int data_counter = 0;
 
+void bt_pkg_reciever(uint8_t* location, uint8_t size){
+  uint8_t *p = location;
+  uint8_t received_data[42]; //FIXME size is undefined
+  for (int i = 0; i< (int)size; i++){
 
+    if (( p[i] == 0xa0) || (p[i] == 0x20) && (recieved_beggining = 0)) {recieved_beggining = 1; } // Finds responce beggining
 
+    if (data_counter == 1) { payload_size = p[i]; } // Gets Payload size
+
+    // Writes recieved data to array
+    if(recieved_beggining = 1){ 
+      received_data[data_counter] = p[i];
+      data_counter++;
+
+    // Sends loaded responce to decoder
+    if ((data_counter >= payload_size) && (data_counter > 1)){
+      data_counter = 0;
+      payload_size = 0;
+      recieved_beggining = 0;
+      decoder(received_data);
+      }
+    }
+  }
+}
+
+void decoder(void* bt_data){
+//EMPTY, for now......
+}
 
