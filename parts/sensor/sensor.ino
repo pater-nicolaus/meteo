@@ -110,7 +110,7 @@ void loop() {
   zeros = zero_adder(press_remainder, accuracy);
   String pressureST = "Press: " + String(press_int, DEC) + '.' + zeros + String(press_remainder, DEC);
   zeros = zero_adder(temp_remainder, accuracy);
-  String tempST = "Temp: " + String(temp_int, DEC) + "." + zeros + String(temp_remainder, DEC) + " Cà";
+  String tempST = "Temp: " + String(temp_int, DEC) + "." + zeros + String(temp_remainder, DEC) + " Cï¿½";
   pressureST.toCharArray(pressstr, sizeof(pressstr));
   tempST.toCharArray(temperature, sizeof(temperature));
   sprintf(humiditystr, "Hum:  %d %%", (int)hum);
@@ -133,50 +133,99 @@ void loop() {
 } 
 
 // Reciever version 1 ___________________________________________________________
-uint8_t received_data[];
-bool recieve_ctrl = 0;
-
-uint8_t recieve_bt_data(){
-  /***
-  //PLACEHOLDER = RECIEVED DATA FROM BT CONTROLLER
-  ***/
-  return //PLACEHOLDER
-}
-
-void package_reciever(){
-  uint8_t blue_pkg = recieve_bt_data();
-  if ( (blue_pkg = 0xa0) or (blue_pkg = 0x20)){
-    recieve_ctrl = 1;
-    recieved_data[0] = blue_pkg;
-    recieved_data[1] = recieve_bt_data();
-    recieved_data[2] = recieve_bt_data();
-    for(i = 3; i < int( received_data[1] ); i++){
-      received_data[i] = recieve_bt_data();
-    }
-  }
-}
+//uint8_t received_data[];
+//bool recieve_ctrl = 0;
+//
+//uint8_t recieve_bt_data(){
+//  /***
+//  //PLACEHOLDER = RECIEVED DATA FROM BT CONTROLLER
+//  ***/
+//  return //PLACEHOLDER
+//}
+//
+//void package_reciever(){
+//  int i;
+//  uint8_t blue_pkg = recieve_bt_data();
+//  if ( (blue_pkg = 0xa0) or (blue_pkg = 0x20)){
+//    recieve_ctrl = 1;
+//    recieved_data[0] = blue_pkg;
+//    recieved_data[1] = recieve_bt_data();
+//    recieved_data[2] = recieve_bt_data();
+//    for(
+//    i = 3; i < int( received_data[1] ); i++){
+//      received_data[i] = recieve_bt_data();
+//    }
+//  }
+//}
 // END OF Reciever version 1 ____________________________________________________
 
 
 // Reciever version 2 ___________________________________________________________
 int reciever_counter = 0;
-void bt_pkg_reciever(bt_pkg){
-  if(reciever_counter < 2){
-    recieved_data[reciever_counter] = bt_pkg;
-    reciever_counter++;
-  }  
-  elif(2 < reciever_counter < int( received_data[1] )){
-    recieved_data[reciever_counter] = bt_pkg;
-    reciever_counter++;
-  }
-  else{
-    decoder(received_data)
-    reciever_counter = 0;
-  }
+//void bt_pkg_reciever(bt_pkg){
+//  if(reciever_counter < 2){
+//    recieved_data[reciever_counter] = bt_pkg;
+//    reciever_counter++;
+//  }  
+//  elif(2 < reciever_counter < int( received_data[1] )){
+//    recieved_data[reciever_counter] = bt_pkg;
+//    reciever_counter++;
+//  }
+//  else{
+//    decoder(received_data)
+//    reciever_counter = 0;
+//  }
+//}
+
+//void decoder(bt_data){
+////EMPTY
+//}
+
+// END OF Reciever version 2 ___________________________________________________
+
+
+void cmd_dfu_reset(uint8_t* buf, uint8_t boottype){
+  *buf = 0x20;
+   buf++;
+  *buf = 0x01;
+   buf++;
+   buf[0] = 0; 
+   buf[1] = 0;
+   buf[2] = boottype;  
 }
 
-void decoder(bt_data){
-//EMPTY
+  
+void cmd_gatt_discover_characteristics(uint8_t* buf,uint8_t connection,uint32_t service){ 
+   
+   buf[0] = 0x20;
+   buf[1] = 0x05;
+   buf[2] = 0x09;
+   buf[3] = 0x03;
+   buf[4] = connection;
+   buf[5] = service;
+   buf[6] = service >> 8;
+   buf[7] = service >> 16;
+   buf[8] = service >> 24;
 }
 
-// END OF Reciever version 2 ____________________________________________________
+
+void cmd_gatt_discover_characteristics_by_uuid(uint8_t* buf, uint8_t connection, uint32_t service, uint8_t uuid_len, const uint8 *uuid_data){
+
+
+   buf[0] = 0x20;
+   buf[1] = 0x06;
+   buf[2] = 0x09;
+   buf[3] = 0x04;
+   buf[4] = connection; 
+   buf[5] = service;
+   buf[6] = service>>8;
+   buf[7] = service>>16;
+   buf[8] = service>>24;
+   buf[9] = uuid;
+}
+
+
+
+
+
+
