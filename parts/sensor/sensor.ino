@@ -237,7 +237,7 @@ enum class decoder_state{
   WAIT_REMAINING_PAYLOAD,
 }
 
-decoder_state decoder_int= WAIT_HEADER_START
+decoder_state::decoder_int = decoder_state::WAIT_HEADER_START;
 
 void bt_pkg_reciever(uint8_t* location, uint8_t size){
   uint8_t *p = location;
@@ -247,7 +247,7 @@ void bt_pkg_reciever(uint8_t* location, uint8_t size){
     switch(decoder_state){
       case decoder_state::WAIT_HEADER_START:
         if (( p[i] == 0xa0) || (p[i] == 0x20)) {
-          decoder_int++;
+          decoder_state::decoder_int = decoder_state::WAIT_PAYLOAD_SIZE;
           recieved_data[0] = p[i];
           data_counter = 1;
         }
@@ -257,7 +257,7 @@ void bt_pkg_reciever(uint8_t* location, uint8_t size){
           received_data[data_counter] = p[i];
           payload_size = p[i];
           data_counter++;
-          decoder_int++;
+          decoder_state::decoder_int = decoder_state::WAIT_REMAINING_PAYLOAD;
         }
         break;
 
@@ -266,30 +266,34 @@ void bt_pkg_reciever(uint8_t* location, uint8_t size){
           received_data[data_counter] = p[i];
           data_counter++;
         }
+        else {
+          decoder(received_data[payload_size + 2]);
+          decoder_state::decoder_int = decoder_state::WAIT_HEADER_START;
+        }
         break;
     }
   }
 
-  for (int i = 0; i< (int)size; i++){
+  // for (int i = 0; i< (int)size; i++){
 
-    if (( p[i] == 0xa0) || (p[i] == 0x20) && (recieved_beggining = 0)) {recieved_beggining = 1; } // Finds responce beggining
+  //   if (( p[i] == 0xa0) || (p[i] == 0x20) && (recieved_beggining = 0)) {recieved_beggining = 1; } // Finds responce beggining
 
-    if (data_counter == 1) { payload_size = p[i]; } // Gets Payload size
+  //   if (data_counter == 1) { payload_size = p[i]; } // Gets Payload size
 
-    // Writes recieved data to array
-    if(recieved_beggining = 1){ 
-      received_data[data_counter] = p[i];
-      data_counter++;
+  //   // Writes recieved data to array
+  //   if(recieved_beggining = 1){ 
+  //     received_data[data_counter] = p[i];
+  //     data_counter++;
 
-    // Sends loaded responce to decoder
-    if ((data_counter >= payload_size) && (data_counter > 1)){
-      data_counter = 0;
-      payload_size = 0;
-      recieved_beggining = 0;
-      decoder(received_data);
-      }
-    }
-  }
+  //   // Sends loaded responce to decoder
+  //   if ((data_counter >= payload_size) && (data_counter > 1)){
+  //     data_counter = 0;
+  //     payload_size = 0;
+  //     recieved_beggining = 0;
+  //     decoder(received_data);
+  //     }
+  //   }
+  // }
 }
 
 void decoder(void* bt_data){
