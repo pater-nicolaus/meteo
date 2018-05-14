@@ -221,7 +221,9 @@ void cmd_gatt_discover_characteristics_by_uuid(uint8_t* buf, uint8_t connection,
    buf[6] = service>>8;
    buf[7] = service>>16;
    buf[8] = service>>24;
-//   buf[9] = uuid; TODO: IMPLEMENT
+   for(int i = 0; i < uuid_len; i++){
+      buf[9 + i] = uuid_data[i];
+   }
 }
 
 
