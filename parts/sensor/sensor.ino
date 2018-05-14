@@ -175,11 +175,11 @@ int reciever_counter = 0;
 //    decoder(received_data)
 //    reciever_counter = 0;
 //  }
-//}
+// }
 
-//void decoder(bt_data){
-////EMPTY
-//}
+// void decoder(bt_data){
+// //EMPTY
+// }
 
 // END OF Reciever version 2 ___________________________________________________
 
@@ -231,9 +231,45 @@ int payload_size = 0;
 int recieved_beggining = 0;
 int data_counter = 0;
 
+enum class decoder_state{
+  WAIT_HEADER_START,
+  WAIT_PAYLOAD_SIZE,
+  WAIT_REMAINING_PAYLOAD,
+}
+
+decoder_state decoder_int= WAIT_HEADER_START
+
 void bt_pkg_reciever(uint8_t* location, uint8_t size){
   uint8_t *p = location;
   uint8_t received_data[42]; //FIXME size is undefined
+
+  for (int i = 0; i< (int)size; i++) {
+    switch(decoder_state){
+      case decoder_state::WAIT_HEADER_START:
+        if (( p[i] == 0xa0) || (p[i] == 0x20)) {
+          decoder_int++;
+          recieved_data[0] = p[i];
+          data_counter = 1;
+        }
+        break;
+      case decoder_state::WAIT_PAYLOAD_SIZE:
+        if (i == 1){
+          received_data[data_counter] = p[i];
+          payload_size = p[i];
+          data_counter++;
+          decoder_int++;
+        }
+        break;
+
+      case decoder_state::WAIT_REMAINING_PAYLOAD:
+        if (data_counter < payload_size) {
+          received_data[data_counter] = p[i];
+          data_counter++;
+        }
+        break;
+    }
+  }
+
   for (int i = 0; i< (int)size; i++){
 
     if (( p[i] == 0xa0) || (p[i] == 0x20) && (recieved_beggining = 0)) {recieved_beggining = 1; } // Finds responce beggining
