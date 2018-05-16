@@ -1,4 +1,4 @@
-#include <U8glib.h>.....
+#include <U8glib.h>
 #include <BME280I2C.h>
 #include <Wire.h>
 #include <math.h>
@@ -229,7 +229,7 @@ void cmd_gatt_discover_characteristics_by_uuid(uint8_t* buf, uint8_t connection,
 
 // Reciever version 2 ___________________________________________________________
 //int reciever_counter = 0;
-int payload_size = 0;
+int message_size = 0;
 int recieved_beggining = 0;
 int data_counter = 0;
 
@@ -243,34 +243,31 @@ decoder_state::decoder_int = decoder_state::WAIT_HEADER_START;
 
 void bt_pkg_reciever(uint8_t* location, uint8_t size){
   uint8_t *p = location;
-  uint8_t received_data[42]; //FIXME size is undefined
+  uint8_t received_data[259];
 
   for (int i = 0; i< (int)size; i++) {
     switch(decoder_state){
       case decoder_state::WAIT_HEADER_START:
-        if (( p[i] == 0xa0) || (p[i] == 0x20)) {
+        if (( p[i] == 0xA0) || (p[i] == 0x20)) {
           decoder_state::decoder_int = decoder_state::WAIT_PAYLOAD_SIZE;
-          recieved_data[0] = p[i];
+          received_data[0] = p[i];
           data_counter = 1;
         }
         break;
       case decoder_state::WAIT_PAYLOAD_SIZE:
-        if (i == 1){
           received_data[data_counter] = p[i];
-          payload_size = p[i];
+          message_size = p[i] + 4;
           data_counter++;
           decoder_state::decoder_int = decoder_state::WAIT_REMAINING_PAYLOAD;
-        }
         break;
 
       case decoder_state::WAIT_REMAINING_PAYLOAD:
-        if (data_counter < payload_size) {
-          received_data[data_counter] = p[i];
-          data_counter++;
-        }
-        else {
-          decoder(received_data[payload_size + 2]);
+        received_data[data_counter] = p[i];
+        data_counter++;
+        bool message_is_received = data_counter >= message_size;
+        if (message_is_received) {
           decoder_state::decoder_int = decoder_state::WAIT_HEADER_START;
+          decoder(received_data, message_size);
         }
         break;
     }
@@ -298,7 +295,7 @@ void bt_pkg_reciever(uint8_t* location, uint8_t size){
   // }
 }
 
-void decoder(void* bt_data){
+void decoder(void* bt_data,uint8_t message_size){
 //EMPTY, for now......
-}
 
+}
