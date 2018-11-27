@@ -272,27 +272,6 @@ void bt_pkg_reciever(uint8_t* location, uint8_t size){
         break;
     }
   }
-
-  // for (int i = 0; i< (int)size; i++){
-
-  //   if (( p[i] == 0xa0) || (p[i] == 0x20) && (recieved_beggining = 0)) {recieved_beggining = 1; } // Finds responce beggining
-
-  //   if (data_counter == 1) { payload_size = p[i]; } // Gets Payload size
-
-  //   // Writes recieved data to array
-  //   if(recieved_beggining = 1){ 
-  //     received_data[data_counter] = p[i];
-  //     data_counter++;
-
-  //   // Sends loaded responce to decoder
-  //   if ((data_counter >= payload_size) && (data_counter > 1)){
-  //     data_counter = 0;
-  //     payload_size = 0;
-  //     recieved_beggining = 0;
-  //     decoder(received_data);
-  //     }
-  //   }
-  // }
 }
 
 void decoder(void* bt_data,uint8_t message_size){
